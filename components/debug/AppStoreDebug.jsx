@@ -6,8 +6,8 @@ const AppStoreDebug = () => {
 
   useEffect(() => {
     const handleKeyUp = (e) => {
-      if (e.key == "/") setShowing(prevShowing => !prevShowing);
-    }
+      if (e.key == "/") setShowing((prevShowing) => !prevShowing);
+    };
     window.addEventListener("keyup", handleKeyUp);
     return () => window.removeEventListener("keyup", handleKeyUp);
   }, []);
@@ -18,11 +18,11 @@ const AppStoreDebug = () => {
     const rows = [];
     for (let storeKey in _store.state) {
       let val = _store.state[storeKey];
-      
-      if (val && typeof val == "object" && val.length && val.length > 0) {
-        val = `Array(${val.length})`; // special display for arrays
+
+      if (val && typeof val == "object") {
+        val = `Object(${JSON.stringify(val)}`; // special display for objects (including Arrays)
       }
-      
+
       if (val && typeof val == "string" && val.length && val.length > 100) {
         val = `${val.substring(0, 100)}...`; // special display for long strings
       }
@@ -37,19 +37,20 @@ const AppStoreDebug = () => {
 
     return (
       <table>
-        <tbody>
-          {rows}
-        </tbody>
+        <tbody>{rows}</tbody>
       </table>
-    )
-  }
+    );
+  };
 
   return (
     <>
-      <div id="socket-indicator" onClick={() => setShowing(prevShowing => !prevShowing)}></div>
+      <div
+        id="socket-indicator"
+        onClick={() => setShowing((prevShowing) => !prevShowing)}
+      ></div>
       {showing && <div id="debug-panel">{renderTable()}</div>}
     </>
-  )
-}
+  );
+};
 
 export default AppStoreDebug;
