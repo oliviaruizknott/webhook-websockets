@@ -79,11 +79,21 @@ app.get("/", (req, res) => {
 // Add a POST request handler at the /webhook endpoint
 app.post("/webhook", (req, res) => {
   // Log the data from the POST request body to the console
+  eventLog("Webook POST received!");
   console.log("[POST Request Body]:", req.body);
   res.status(200).json({ message: "Data received" }); // Send a response
 
+  // Format the message for the App Store;
+  // In this case, we expect a hex color code in the POST request body and send it with the "COLOR" key
+  let message = {
+    key: "COLOR",
+    value: req.body.content,
+    store: true,
+    type: "string",
+  };
+
   // Send the data to all connected clients
-  sendToAll(JSON.stringify(req.body));
+  sendToAll(JSON.stringify(message));
 });
 
 app.listen(port, () => {
