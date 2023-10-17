@@ -76,26 +76,45 @@ app.get("/", (req, res) => {
   res.json({ message: "You're at the root!" });
 });
 
-// Add a POST request handler at the /webhook endpoint
+// Add a POST request handler at the /webhook endpoint.
+// This is expecting specific data from the NFC.cool webhook that looks like:
+// {
+//   tagIdentifier: '04:E1:3D:8A:13:6F:80',
+//   date: '2023-10-12T23:57:46Z',
+//   content: 'Does this tag trigger the web hook?'
+// }
 app.post("/webhook", (req, res) => {
   // Log the data from the POST request body to the console
   eventLog("Webook POST received!");
   console.log("[POST Request Body]:", req.body);
   res.status(200).json({ message: "Data received" }); // Send a response
 
-  // Format the message for the App Store;
-  // In this case, we expect a hex color code in the POST request body and send it with the "COLOR" key
-  let message = {
-    key: "COLOR",
-    value: req.body.content,
-    store: true,
-    type: "string",
-  };
+  if (req.body.tagIdentifier) {
+    sendToAll(
+      JSON.stringify(
+        formatForAppStore("TAG_IDENTIFIER", req.body.tagIdentifier)
+      )
+    );
+  }
 
-  // Send the data to all connected clients
-  sendToAll(JSON.stringify(message));
+  if (req.body.date) {
+    sendToAll(JSON.stringify(formatForAppStore("DATE", req.body.date)));
+  }
+
+  if (req.body.content) {
+    sendToAll(JSON.stringify(formatForAppStore("CONTENT", req.body.content)));
+  }
 });
 
 app.listen(port, () => {
   eventLog(`HTTP server is listening on port ${port}`);
 });
+
+const formatForAppStore = (key, value) => {
+  return {
+    key: key,
+    value: value,
+    store: true,
+    type: "string",
+  };
+};

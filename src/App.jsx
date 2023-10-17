@@ -10,7 +10,8 @@ const BLUE = "3185fc";
 
 const App = () => {
   const hexColor = useGetValue("COLOR", "ffffff");
-  const hasConnected = useGetValue(AppStoreDistributed.CONNECTED, false)
+  const content = useGetValue("CONTENT", "No content yet.");
+  const hasConnected = useGetValue(AppStoreDistributed.CONNECTED, false);
 
   const setColorFromHash = useCallback(() => {
     const urlColor = URLUtil.getHashQueryParam("COLOR");
@@ -29,19 +30,20 @@ const App = () => {
     if (hasConnected) setColorFromHash();
   }, [hasConnected, setColorFromHash]);
 
+  // if a new CONTENT value is detected (from the /webhook),
+  // set it as the the COLOR value
+  useEffect(() => {
+    setValue("COLOR", content);
+  }, [content]);
+
   return (
     <div className="App" style={{ backgroundColor: `#${hexColor}` }}>
       <AppStoreDebug />
       <h3>Color Tapping</h3>
-      <button onClick={() => setValue("COLOR", RED)}>
-        Red
-      </button>
-      <button onClick={() => setValue("COLOR", YELLOW)}>
-        Yellow
-      </button>
-      <button onClick={() => setValue("COLOR", BLUE)}>
-        Blue
-      </button>
+      <button onClick={() => setValue("COLOR", RED)}>Red</button>
+      <button onClick={() => setValue("COLOR", YELLOW)}>Yellow</button>
+      <button onClick={() => setValue("COLOR", BLUE)}>Blue</button>
+      <p>NFC Tag Content: {content}</p>
     </div>
   );
 };
